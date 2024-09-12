@@ -53,9 +53,9 @@ print("alalal")
 
 
 
-@myapp.get("/")
-def returnResult():
-    return {'results':detected_objects}
+# @myapp.get("/")
+# def returnResult():
+#     return {'results':detected_objects}
     
            
 
