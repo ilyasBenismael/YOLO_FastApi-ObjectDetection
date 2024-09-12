@@ -1,0 +1,359 @@
+************************************ Steps :
+
+1-3rf kifch tfine tunni yolo model
+-logic nd architechture of yolo and why he is the best
+-find good model t depth estimation o 3rf ki khdam o ki tkhdmo
+-combini both models
+
+*learn in short about : neural networks, cnn, resnet (all linked terms)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+************************************ the paper : Vehicle Distance Estimation from a Monocular Camera for ADAS **********************************************
+
+
+____Abstract :
+
+-we making a framework thats uses : "transformer-based-object-detector" that provides the type of each object and the coordinate information of a bounding box around 
+each object and "transformer-based depth estimator" that generates a depth map for the image
+-then we train 3 models (eXtreme Gradient Boosting, Random Forest, and Long Short-Term Memory) to predict more accurate distance based on (the type of the object, coordinates and size of the object, the extracted depth features) + we use "trimmed mean depth" that excludes the background pixels around an object but within the bounding box of the object
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+****************************************************************** infos *****************************************************************************
+
+
+
+***treshold : 
+l3atba tl 2inti9a2, seuill
+
+****Inference :
+in the context of machine learning and deep learning refers to the process of making predictions or drawing conclusions from a trained model using new data.
+
+
+****positive :
+refers to a prediction made by the model indicating that a certain condition is met or a certain object is detected. 
+
+
+***CUDA :
+-Stands for Compute Unified Device Architecture. It is a parallel computing platform and programming model developed by NVIDIA that allows developers to use the GPU for general-purpose computing (not just graphics).
+-CUDA enables the use of NVIDIA GPUs to accelerate compute-heavy tasks like deep learning, image processing, and more. Essentially, it allows you to run your neural network operations much faster by leveraging the parallel processing power of a GPU.
+
+
+
+******transfer-learning : 
+a machine learning technique where we have a pre-trained model that's trained for a specific task, and u train it to do a new task using the usefull knowledge he gained from source task tat will be usefull for the new task, for example the detection of textures and edges.. we gained from cars detection will be usefull to detect
+people.
+
+******Fine-tuning :
+is a form of transfer learning, where the knowledge gained from the pre-trained model is transferred to a new task. The idea is that the model has already learned a lot from the large dataset, and only minor adjustments are needed to make it work well on the specific data-set. 
+
+
+
+ 
+*******GPU acceleration :
+refers to the use of a Graphics Processing Unit (GPU) to perform computations more efficiently than a Central Processing Unit (CPU). GPUs are designed to handle parallel tasks and large amounts of data simultaneously, which makes them particularly well-suited for tasks in deep learning and other computationally intensive applications.
+
+
+
+***the Validation Set :
+helps in :
+-Hyperparameter Tuning: The validation set is used to adjust the hyperparameters of the model (such as learning rate, number of layers, etc.). By evaluating the model on the validation set, you can see how changes in these parameters affect performance.
+-Performance Monitoring: During training, the model is repeatedly evaluated on the validation set to monitor its performance. This helps in detecting overfitting, where the model performs well on the training data but poorly on unseen data.
+
+
+************Kera:
+Keras started as a standalone framework, but it's now integrated as the official high-level API for TensorFlow. This means that when you use Keras, you're often working with TensorFlow in the background, After TensorFlow 2.0, Keras became the default interface for TensorFlow, allowing users to easily define and train models with fewer lines of code.
+
+
+
+
+
+********************************Coco Dataset :
+
+**The COCO dataset :
+includes not just images and annotations but also :
+-standardized evaluation protocols and metrics like Average Precision (AP) to measure model performance. 
+-tools and APIs, such as pycocotools, to easily work with the data, visualize results, and compute these metric
+-it makes annual competitions where researchers and practitioners submit their models to be evaluated on the COCO test set using the standard protocols.
+
+**The "2017 Train/Val annotations [241MB]" file:
+The "Train/Val" part of the name indicates that this file includes annotations for both the training set and the validation set of the COCO 2017 dataset. The training set is used to train machine learning models, while the validation set is used to tune the models and evaluate their performance during development.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+********************************************************************* YOLO *******************************************************************************
+
+
+**about yolo :
+YOLO uses labeled data containing (class of the object and coordinates of its bounding box), and process the images through a CNN and compare results to the real labels then reduce the loss fonction using algorithm like SGD with momentum or Adam until it has parameters that can detect the class and the box efficently
+YOLO uses grid-based detection, anchor boxes, and unified architecture which make it one of the fastest and most efficient object detectors. Parameters like anchor boxes, grid size, learning rate, and data augmentation can be adjusted to improve accuracy.
+
+-can be used for tracking, segmentation, detection and pose 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+****************************************************************** PYTORCH ***************************************************************************************
+
+
+**PyTorch and TensorFlow :
+are two of the most popular deep learning frameworks used for building and training machine learning models
+-PyTorch is favored for its ease of use, dynamic computation graphs, and flexibility. It is particularly popular in research and academic settings due to its intuitive nature and strong support for rapid prototyping.
+-TensorFlow is known for its performance, extensive deployment options, and mature ecosystem. It is widely used in production environments and industry applications
+
+**why it is considered framework and not just a library : 
+PyTorch and TensorFlow are considered a framework rather than just a library because it provides a comprehensive suite of tools and functionalities that cover the entire machine learning workflow, from model creation and training to evaluation and deployment.
+
+
+
+
+***model standardization :
+-The use of standardized method names and interfaces in model development is crucial for improving usability and ensuring consistency across different tasks, models, and libraries. Conventions like model(input) for passing data and methods like generate(), predict(), or classify() make it easier for developers and researchers to:
+-This approach promotes a more unified and accessible ecosystem for building and using machine learning models across different domains like computer vision, NLP, and speech.
+
+
+
+
+
+******************************loading a model ::
+
+
+_________torch.hub.load() : is a part of PyTorch's hub system, which allows easy access to pre-trained models and scripts from GitHub repositories.
+
+***to load a model with pytorch and work with it with the pytorch framework, the model needs to be written with pytorch (yolo models are written with pytorch), there is other tensorflow versions of the yolo model so u can use it with tensorflow.
+
+****steps :
+-torch.hub.load() clones a PyTorch-compatible repository.
+-It uses hubconf.py to define how the model is instantiated.
+-The model is encapsulated as a PyTorch nn.Module, allowing you to use it with PyTorch functionalities.
+-Pretrained weights can be downloaded and applied to the model.
+-The repository must be written in Python and designed for PyTorch—you cannot use torch.hub.load() for non-PyTorch models or repositories written in other languages.
+
+****Here are the parameters you can use:
+-repo_or_dir: (str) The repository or directory to load the model from. This is the URL or path to the repository containing the model definition.
+-model: (str) The model name or function to load from the repository. This should correspond to a model defined in the repository.
+-source: (str, optional) Source to load the model from. This can be 'github', 'local', or 'model'. Defaults to 'github'.
+-force_reload: (bool, optional) Whether to force reload the model even if it is already cached. Defaults to False.
+-trust_repo: (bool, optional) Whether to trust the repository. If set to False, it will not automatically trust the repo's code and might require manual verification. Defaults to True.
+-verbose: (bool, optional) Whether to print loading progress and information. Defaults to True.
+
+
+
+
+*****************************doing inference :: 
+
+____model() = torch.hub.load(); output = model('input_img', conf...) 
+
+*conf_thres:
+Type: float
+Description: Confidence threshold for detecting objects. Only detections with a confidence score above this threshold are considered.
+Default: 0.25
+
+*classes:
+Type: list of int or int
+Description: List of class indices to filter detections by. For example, [0, 1] will detect only the classes with indices 0 and 1. If None, detects all classes.
+Default: None
+
+*max_det:
+Type: int
+Description: Maximum number of detections per image. Limits the number of objects detected in each image.
+Default: 300
+
+
+
+
+
+
+
+
+************results.pred :
+
+[N, 6] : where N is the number of detected objects, and the 6 values represent different properties of each detection, [x1, y1, x2, y2, confidence, class_id]
+-x1, y1: The coordinates of the top-left corner of the bounding box.
+-x2, y2: The coordinates of the bottom-right corner of the bounding box.
+-confidence: The confidence score.
+-class_id: The class index of the detected object, which refers to the predicted class.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*********************************************************************** work **************************************************************************
+
+
+
+
+***yolov8 m classes that can detect :
+
+names: {0: 'person', 1: 'bicycle', 2: 'car', 3: 'motorcycle', 4: 'airplane', 5: 'bus', 6: 'train', 7: 'truck', 8: 'boat', 9: 'traffic light', 10: 'fire hydrant', 
+11: 'stop sign', 12: 'parking meter', 13: 'bench', 14: 'bird', 15: 'cat', 16: 'dog', 17: 'horse', 18: 'sheep', 19: 'cow', 20: 'elephant', 21: 'bear', 22: 'zebra', 23: 'giraffe', 24: 'backpack', 25: 'umbrella', 26: 'handbag', 27: 'tie', 28: 'suitcase', 29: 'frisbee', 30: 'skis', 31: 'snowboard', 32: 'sports ball', 33: 'kite', 34: 'baseball bat', 35: 'baseball glove', 36: 'skateboard', 37: 'surfboard', 38: 'tennis racket', 39: 'bottle', 40: 'wine glass', 41: 'cup', 42: 'fork', 43: 'knife', 44: 'spoon', 45: 'bowl', 46: 'banana', 47: 'apple', 48: 'sandwich', 49: 'orange', 50: 'broccoli', 51: 'carrot', 52: 'hot dog', 53: 'pizza', 54: 'donut', 55: 'cake', 56: 'chair', 57: 'couch', 58: 'potted plant', 59: 'bed', 60: 'dining table', 61: 'toilet', 62: 'tv', 63: 'laptop', 64: 'mouse', 65: 'remote', 66: 'keyboard', 67: 'cell phone', 68: 'microwave', 69: 'oven', 70: 'toaster', 71: 'sink', 72: 'refrigerator', 73: 'book', 74: 'clock', 75: 'vase', 76: 'scissors', 77: 'teddy bear', 78: 'hair drier', 79: 'toothbrush'}
+
+
+
+
+0: 'person'                          //person ,   0 
+1: 'bicycle', 3: 'motorcycle'        //bike  , 1 , 3
+2: 'car', 5: 'bus', 7: 'truck',      //vehicule , 2 , 5 , 7
+9: 'traffic light', 11: 'stop sign'  //traffic sign , 9 , 11
+15: 'cat', 16: 'dog', 17: 'horse', 18: 'sheep', 19: 'cow' // animal 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
