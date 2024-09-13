@@ -10,7 +10,7 @@ from fastapi import FastAPI
 
 myapp = FastAPI()
 
-model = torch.hub.load('ultralytics/yolov5', 'yolov5m')
+model = torch.hub.load('ultralytics/yolov5', 'yolov5n', device='cpu')
 
 img = Image.open('pics/lgdg.jpg')
 
