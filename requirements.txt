@@ -3,3 +3,4 @@ ultralytics
 Pillow
 fastapi
 uvicorn
+opencv-python-headless
