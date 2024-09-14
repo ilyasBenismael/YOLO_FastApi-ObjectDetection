@@ -5,7 +5,12 @@ FROM python:3.9-slim
 RUN apt-get update && apt-get install -y \
     libgl1-mesa-glx \
     libglib2.0-0
+    # System Dependencies: These are libraries that are not written in Python but are required by Python packages.
+    # For example, OpenCV relies on certain system libraries to handle graphical operations or other lower-level
+    # tasks. These libraries need to be installed at the OS level, and therefore are specified in the 
+    # Dockerfile using apt-get. They are not Python packages and thus cannot be listed in requirements.txt.
 
+    
 # Set the working directory in the container
 WORKDIR /app
 

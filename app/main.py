@@ -48,7 +48,12 @@ for pred in results.pred:
 
 @myapp.get("/")
 def returnResult():
-    return {'results':detected_objects}
+    return 'heey brother'
+
+
+@myapp.get("/image")
+def returnResult():
+    return {'results':detected_objects}    
     
            
 
