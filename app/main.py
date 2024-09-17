@@ -1,7 +1,9 @@
 import torch
 from PIL import Image
 from ultralytics import YOLO
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket
+import websockets
+import time
 
 
 
@@ -51,9 +53,12 @@ def returnResult():
     return 'heey brother'
 
 
-@myapp.get("/image")
-def returnResult():
-    return {'results':detected_objects}    
-    
-           
+@myapp.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    # Handle a WebSocket connection
+    while True:
+        # data = await websocket.receive_text()
+        time.sleep(10)
+        await websocket.send_text("heey")
+        
 
