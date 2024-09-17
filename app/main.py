@@ -72,7 +72,7 @@ html = """
         <ul id='messages'>
         </ul>
         <script>
-            var ws = new WebSocket("ws://safedrivefastapi-production.up.railway.app/ws");
+            var ws = new WebSocket("wss://safedrivefastapi-production.up.railway.app/ws");
             ws.onmessage = function(event) {
                 var messages = document.getElementById('messages')
                 var message = document.createElement('li')
