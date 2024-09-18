@@ -1,107 +1,52 @@
 import torch
 from PIL import Image
+from io import BytesIO
 from ultralytics import YOLO
 from fastapi import FastAPI, WebSocket
-import websockets
 import time
-from fastapi.responses import HTMLResponse
 
+# Load YOLO model (yolov5n is a lightweight model)
+model = torch.hub.load('ultralytics/yolov5', 'yolov5n', device='cpu')
 
-
-
-
-# model = torch.hub.load('ultralytics/yolov5', 'yolov5n', device='cpu')
-
-# img = Image.open('pics/lgdg.jpg')
-
-# results = model(img)
-
-# results.save('results')
-
-# classes_of_interest = [0, 1, 3, 2, 5, 7, 9, 11, 15, 16, 17, 18, 19]
-
-# detected_objects = []
-
-
-# Access details of detected objects like bounding boxes, confidence, and labels
-# for pred in results.pred:
-#     for obj in pred:
-#         bbox = obj[:4]  # Bounding box coordinates (x1, y1, x2, y2)
-#         confidence = obj[4]  # Confidence score
-#         class_id = int(obj[5])  # Class ID
-
-#         # Filter only the classes of interest
-#         if class_id in classes_of_interest:
-#             class_name = results.names[class_id]  # Get the class name            
-#             # Create a map (dictionary) for the detected object
-#             detected_obj = {
-#                 'class_name': class_name,
-#                 'bbox': bbox.tolist(),  # Convert tensor to list
-#                 'confidence': round(confidence.item(), 2),  # Convert to float and round off
-#                 'class_id': class_id
-#             }
-            
-#             # Add the detected object map to the list
-#             detected_objects.append(detected_obj)
-
-
-
-# @myapp.get("/")
-# def returnResult():
-#     return 'heey brother'
-
-
-
-
-
-
+# Create FastAPI app
 myapp = FastAPI()
 
-# html = """
-# <!DOCTYPE html>
-# <html>
-#     <head>
-#         <title>Chat</title>
-#     </head>
-#     <body>
-#         <h1>WebSocket Chat</h1>
-#         <form action="" onsubmit="sendMessage(event)">
-#             <input type="text" id="messageText" autocomplete="off"/>
-#             <button>Send</button>
-#         </form>
-#         <ul id='messages'>
-#         </ul>
-#         <script>
-#             var ws = new WebSocket("wss://safedrivefastapi-production.up.railway.app/ws");
-#             ws.onmessage = function(event) {
-#                 var messages = document.getElementById('messages')
-#                 var message = document.createElement('li')
-#                 var content = document.createTextNode(event.data)
-#                 message.appendChild(content)
-#                 messages.appendChild(message)
-#             };
-#             function sendMessage(event) {
-#                 var input = document.getElementById("messageText")
-#                 ws.send(input.value)
-#                 input.value = ''
-#                 event.preventDefault()
-#             }
-#         </script>
-#     </body>
-# </html>
-# """
-
-
-# @myapp.get("/")
-# async def get():
-#     return HTMLResponse(html)
-
+# Classes of interest (change as needed)
+classes_of_interest = [0, 1, 3, 2, 5, 7, 9, 11, 15, 16, 17, 18, 19]
 
 @myapp.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
+    
     await websocket.accept()
-    while True:
-        data = await websocket.receive_text()
-        await websocket.send_text(data + " alaa")
 
+    try:
+        while True:
+            # Receive the image bytes from the client
+            image_bytes = await websocket.receive_bytes()
+
+            # Convert the bytes to a PIL image using PIL
+            image = Image.open(BytesIO(image_bytes))
+
+            # Run the YOLO model on the image
+            results = model(image)
+
+            # Filter results by classes of interest
+            detected_objects = []
+            detected_objects_names = []
+            for pred in results.pred[0]:  # Loop over detections
+                class_id = int(pred[-1])  # The class ID is the last value
+                if class_id in classes_of_interest:
+                    detected_objects.append({
+                        'class': model.names[class_id],
+                        'confidence': float(pred[4]),  # Confidence score
+                        'bbox': [float(pred[0]), float(pred[1]), float(pred[2]), float(pred[3])]  # Bounding box
+                    })
+                    detected_objects_names.append(model.names[class_id])
+
+            # Send the detection results back to the client as JSON
+            await websocket.send_json({'detections': detected_objects_names})
+
+    except Exception as e:
+        print(f"Error: {e}")
+ 
 
