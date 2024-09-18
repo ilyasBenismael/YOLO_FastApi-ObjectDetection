@@ -100,10 +100,8 @@ myapp = FastAPI()
 @myapp.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
-    # while True:
-    #     data = await websocket.receive_text()
-    #     await 
-    await websocket.send_text("abooooood")
-    await websocket.close()
+    while True:
+        data = await websocket.receive_text()
+        await websocket.send_text(data + " alaa")
 
 
