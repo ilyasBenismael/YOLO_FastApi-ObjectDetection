@@ -1,64 +1,3 @@
-# import torch
-# from PIL import Image
-# from io import BytesIO
-# from ultralytics import YOLO
-# from fastapi import FastAPI, WebSocket
-
-# # Load YOLO model (yolov5n is a lightweight model)
-# model = torch.hub.load('ultralytics/yolov5', 'yolov5n', device='cpu')
-
-# # Create FastAPI app
-# myapp = FastAPI()
-
-# # Classes of interest (change as needed)
-# classes_of_interest = [0, 1, 3, 2, 5, 7, 9, 11, 15, 16, 17, 18, 19]
-
-# def process_image(image_path):
-#     # Load and process the image
-#     results = model(image_path)
-    
-#     # Render the bounding boxes on the image
-#     results.render()  
-    
-#     # Convert the rendered image to bytes
-#     img_buffer = BytesIO()
-#     Image.fromarray(results.ims[0]).save(img_buffer, format='JPEG')
-#     rendered_image_bytes = img_buffer.getvalue()
-    
-#     return rendered_image_bytes
-
-# def main():
-#     # Example image path (change this to your actual image path)
-#     image_path = "pics/bus.jpg"
-    
-#     # Process the image and get the rendered bytes
-#     rendered_image_bytes = process_image(image_path)
-    
-#     # Print the rendered image bytes
-#     print("Rendered image bytes length:", len(rendered_image_bytes))
-    
-#     # Optional: Save the rendered image to a file for verification
-#     with open('rendered_image.jpg', 'wb') as f:
-#         f.write(rendered_image_bytes)
-#     print("Rendered image saved as 'rendered_image.jpg'")
-
-# if __name__ == "__main__":
-#     main()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 import torch
 from PIL import Image
@@ -120,5 +59,3 @@ async def websocket_endpoint(websocket: WebSocket):
     except Exception as e:
         await websocket.send_text(e)
         print(f"Error: {e}")
- 
-
