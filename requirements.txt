@@ -1,0 +1,9 @@
+torch
+ultralytics
+Pillow
+fastapi
+uvicorn
+opencv-python-headless
+websockets
+numpy
+matplotlib
