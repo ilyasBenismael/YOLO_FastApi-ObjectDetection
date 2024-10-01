@@ -9,16 +9,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-# Load the MiDaS model version small
-midasModel = torch.hub.load("intel-isl/MiDaS", "MiDaS_small")
-# Load the appropriate transforms for midas
-midas_transforms = torch.hub.load("intel-isl/MiDaS", "transforms")
-transform = midas_transforms.small_transform 
+# # Load the MiDaS model version small
+# midasModel = torch.hub.load("intel-isl/MiDaS", "MiDaS_small")
+# # Load the appropriate transforms for midas
+# midas_transforms = torch.hub.load("intel-isl/MiDaS", "transforms")
+# transform = midas_transforms.small_transform 
 
-#put the model in cpu or gpu and make it ready for inference and not training
-device = torch.device("cpu")  
-midasModel.to(device)
-midasModel.eval()
+# #put the model in cpu or gpu and make it ready for inference and not training
+# device = torch.device("cpu")  
+# midasModel.to(device)
+# midasModel.eval()
 
 #Load YOLO model (yolov5n is a lightweight model)
 yoloModel = torch.hub.load('ultralytics/yolov5', 'yolov5n', device='cpu')  
@@ -38,31 +38,30 @@ async def websocket_endpoint(websocket: WebSocket):
             # Receive the image bytes from the client
             image_bytes = await websocket.receive_bytes()
 
-            # Convert the bytes to a PIL image using PIL
             # Convert bytes to a NumPy array
             nparr = np.frombuffer(image_bytes, np.uint8)
             img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-            imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            #prepare the img via transform and put it cpuXgpu so it can be ready for midas process
-            midas_input_img = transform(imgRGB).to(device)         
+            # imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            # #prepare the img via transform and put it cpuXgpu so it can be ready for midas process
+            # midas_input_img = transform(imgRGB).to(device)         
             
-            #maintain the non-gradient context when calling the prediciton (cause we in inference)
-            with torch.no_grad():          
+            # #maintain the non-gradient context when calling the prediciton (cause we in inference)
+            # with torch.no_grad():          
             
-                #getting the prediction
-                midasTensor = midasModel(midas_input_img)          
+            #     #getting the prediction
+            #     midasTensor = midasModel(midas_input_img)          
            
-                #Resize the prediction to match the input image size before transforms
-                midasTensor = torch.nn.functional.interpolate(
-                midasTensor.unsqueeze(1),
-                size=imgRGB.shape[:2],
-                mode="bicubic",
-                align_corners=False,
-            ).squeeze()
+            #     #Resize the prediction to match the input image size before transforms
+            #     midasTensor = torch.nn.functional.interpolate(
+            #     midasTensor.unsqueeze(1),
+            #     size=imgRGB.shape[:2],
+            #     mode="bicubic",
+            #     align_corners=False,
+            # ).squeeze()
         
-            #Convert the prediction to a NumPy array cause it's easy to handle better than a pytorch tensor
-            midasNumpy = midasTensor.cpu().numpy()
+            # #Convert the prediction to a NumPy array cause it's easy to handle better than a pytorch tensor
+            # midasNumpy = midasTensor.cpu().numpy()
 
             #apply inference
             results = yoloModel(img)
@@ -70,16 +69,16 @@ async def websocket_endpoint(websocket: WebSocket):
             results.render()  
             rendered_img = results.ims[0].copy()
             
-            #loop on detected objcts and for each one get the className, and get the meandepth of bbox then print it
-            for pred in results.xyxy[0]:      
-                x1, y1, x2, y2, confidence, class_id = pred
+            # #loop on detected objcts and for each one get the className, and get the meandepth of bbox then print it
+            # for pred in results.xyxy[0]:      
+            #     x1, y1, x2, y2, confidence, class_id = pred
                    
-                depth_values = midasNumpy[int(y1):int(y2)+1, int(x1):int(x2)+1]
-                mean_depth = np.nanmean(depth_values)        
-                mean_depth_str = f"{mean_depth:.2f}"
+            #     depth_values = midasNumpy[int(y1):int(y2)+1, int(x1):int(x2)+1]
+            #     mean_depth = np.nanmean(depth_values)        
+            #     mean_depth_str = f"{mean_depth:.2f}"
         
-                # Add the mean_depth text at the top of the bounding box
-                cv2.putText(rendered_img, mean_depth_str, (int(x2), int(y2)), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2)
+            #     # Add the mean_depth text at the top of the bounding box
+            #     cv2.putText(rendered_img, mean_depth_str, (int(x2), int(y2)), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2)
 
 
             img_buffer = BytesIO()
