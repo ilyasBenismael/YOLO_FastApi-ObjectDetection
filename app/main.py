@@ -1,24 +1,21 @@
 import torch
 from PIL import Image
 from io import BytesIO
-from ultralytics import YOLO
 from fastapi import FastAPI, WebSocket
-import time
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
 
 
-# # Load the MiDaS model version small
-# midasModel = torch.hub.load("intel-isl/MiDaS", "MiDaS_small")
-# # Load the appropriate transforms for midas
-# midas_transforms = torch.hub.load("intel-isl/MiDaS", "transforms")
-# transform = midas_transforms.small_transform 
+# Load the MiDaS model version small
+midasModel = torch.hub.load("intel-isl/MiDaS", "MiDaS_small")
+# Load the appropriate transforms for midas
+midas_transforms = torch.hub.load("intel-isl/MiDaS", "transforms")
+transform = midas_transforms.small_transform 
 
-# #put the model in cpu or gpu and make it ready for inference and not training
-# device = torch.device("cpu")  
-# midasModel.to(device)
-# midasModel.eval()
+#put the model in cpu or gpu and make it ready for inference and not training
+device = torch.device("cpu")  
+midasModel.to(device)
+midasModel.eval()
 
 #Load YOLO model (yolov5n is a lightweight model)
 yoloModel = torch.hub.load('ultralytics/yolov5', 'yolov5n', device='cpu')  
@@ -41,6 +38,7 @@ async def websocket_endpoint(websocket: WebSocket):
             # Convert bytes to a NumPy array
             nparr = np.frombuffer(image_bytes, np.uint8)
             img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
             # imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             # #prepare the img via transform and put it cpuXgpu so it can be ready for midas process
