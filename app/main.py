@@ -6,16 +6,16 @@ import cv2
 import numpy as np
 
 
-# # Load the MiDaS model version small
-# midasModel = torch.hub.load("intel-isl/MiDaS", "MiDaS_small")
-# # Load the appropriate transforms for midas
-# midas_transforms = torch.hub.load("intel-isl/MiDaS", "transforms")
-# transform = midas_transforms.small_transform 
+# Load the MiDaS model version small
+midasModel = torch.hub.load("intel-isl/MiDaS", "MiDaS_small")
+# Load the appropriate transforms for midas
+midas_transforms = torch.hub.load("intel-isl/MiDaS", "transforms")
+transform = midas_transforms.small_transform 
 
-# #put the model in cpu or gpu and make it ready for inference and not training
-# device = torch.device("cpu")  
-# midasModel.to(device)
-# midasModel.eval()
+#put the model in cpu or gpu and make it ready for inference and not training
+device = torch.device("cpu")  
+midasModel.to(device)
+midasModel.eval()
 
 #Load YOLO model (yolov5n is a lightweight model)
 yoloModel = torch.hub.load('ultralytics/yolov5', 'yolov5n', device='cpu')  
