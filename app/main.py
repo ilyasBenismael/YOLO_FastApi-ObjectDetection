@@ -12,6 +12,7 @@ yoloModel = torch.hub.load('ultralytics/yolov5', 'yolov5n', device='cpu')
 # Create FastAPI app
 myapp = FastAPI()
 
+#
 
 @myapp.websocket("/yolo")
 async def websocket_endpoint(websocket: WebSocket):
