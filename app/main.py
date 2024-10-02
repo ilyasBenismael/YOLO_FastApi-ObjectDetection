@@ -84,6 +84,12 @@ async def websocket_endpoint(websocket: WebSocket):
             #     cv2.putText(rendered_img, mean_depth_str, (int(x2), int(y2)), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2)
 
 
+            # Normalize the depth map to 0-255
+            # Ensure that the depth map is scaled correctly
+            midasNumpy = (midasNumpy - np.nanmin(midasNumpy)) / (np.nanmax(midasNumpy) - np.nanmin(midasNumpy)) * 255.0
+            midasNumpy = np.clip(midasNumpy, 0, 255).astype(np.uint8)  # Convert to uint8
+
+
             # turn the numpy img to bytes
             img_buffer = BytesIO()
             Image.fromarray(midasNumpy).save(img_buffer, format='JPEG')
