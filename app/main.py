@@ -12,13 +12,13 @@ midasModel = torch.hub.load("intel-isl/MiDaS", "MiDaS_small")
 midas_transforms = torch.hub.load("intel-isl/MiDaS", "transforms")
 transform = midas_transforms.small_transform 
 
-#put the model in cpu or gpu and make it ready for inference and not training
+# put the model in cpu or gpu and make it ready for inference and not training
 device = torch.device("cpu")  
 midasModel.to(device)
 midasModel.eval()
 
 #Load YOLO model (yolov5n is a lightweight model)
-yoloModel = torch.hub.load('ultralytics/yolov5', 'yolov5n', device='cpu')  
+#yoloModel = torch.hub.load('ultralytics/yolov5', 'yolov5n', device='cpu')  
 
 
 # Create FastAPI app
