@@ -36,9 +36,9 @@ async def websocket_endpoint(websocket: WebSocket):
             image_bytes = await websocket.receive_bytes()
 
             # Convert bytes to a NumPy array
-            nparr = np.frombuffer(image_bytes, np.uint8)
-            img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            # nparr = np.frombuffer(image_bytes, np.uint8)
+            # img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+            # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
             # imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             # #prepare the img via transform and put it cpuXgpu so it can be ready for midas process
@@ -62,10 +62,10 @@ async def websocket_endpoint(websocket: WebSocket):
             # midasNumpy = midasTensor.cpu().numpy()
 
             #apply inference
-            results = yoloModel(img)
+            # results = yoloModel(img)
             
-            results.render()  
-            rendered_img = results.ims[0].copy()
+            # results.render()  
+            # rendered_img = results.ims[0].copy()
             
             # #loop on detected objcts and for each one get the className, and get the meandepth of bbox then print it
             # for pred in results.xyxy[0]:      
@@ -79,10 +79,10 @@ async def websocket_endpoint(websocket: WebSocket):
             #     cv2.putText(rendered_img, mean_depth_str, (int(x2), int(y2)), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2)
 
 
-            img_buffer = BytesIO()
-            Image.fromarray(rendered_img).save(img_buffer, format='JPEG')
-            rendered_image_bytes = img_buffer.getvalue()
-            await websocket.send_bytes(rendered_image_bytes)
+            # img_buffer = BytesIO()
+            # Image.fromarray(rendered_img).save(img_buffer, format='JPEG')
+            # rendered_image_bytes = img_buffer.getvalue()
+            # await websocket.send_bytes(rendered_image_bytes)
            
 
             # Filter results by classes of interest
