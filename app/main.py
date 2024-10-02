@@ -8,24 +8,25 @@ import numpy as np
 
 # Load the MiDaS model version small
 midasModel = torch.hub.load("intel-isl/MiDaS", "MiDaS_small")
+
 # Load the appropriate transforms for midas
 midas_transforms = torch.hub.load("intel-isl/MiDaS", "transforms")
 transform = midas_transforms.small_transform 
 
-# put the model in cpu or gpu and make it ready for inference and not training
+# put the model in cpu or gpu and 
 device = torch.device("cpu")  
 midasModel.to(device)
+
+# make the model ready for inference and not training
 midasModel.eval()
 
-#Load YOLO model (yolov5n is a lightweight model)
+# # Load YOLO model (yolov5n is a lightweight model)
 #yoloModel = torch.hub.load('ultralytics/yolov5', 'yolov5n', device='cpu')  
 
 
 # Create FastAPI app
 myapp = FastAPI()
 
-# Classes of interest (change as needed)
-#classes_of_interest = [0, 1, 3, 2, 5, 7, 9, 11, 15, 16, 17, 18, 19]
 
 @myapp.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
@@ -36,35 +37,39 @@ async def websocket_endpoint(websocket: WebSocket):
             image_bytes = await websocket.receive_bytes()
 
             # Convert bytes to a NumPy array
-            # nparr = np.frombuffer(image_bytes, np.uint8)
-            # img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-            # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            nparr = np.frombuffer(image_bytes, np.uint8)
+            img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-            # imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            # #prepare the img via transform and put it cpuXgpu so it can be ready for midas process
-            # midas_input_img = transform(imgRGB).to(device)         
+            # Convert img to RGB
+            imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             
-            # #maintain the non-gradient context when calling the prediciton (cause we in inference)
-            # with torch.no_grad():          
+            # prepare the img via transform and put it cpu so it can be ready for midas process
+            midas_input_img = transform(imgRGB).to(device)         
             
-            #     #getting the prediction
-            #     midasTensor = midasModel(midas_input_img)          
+            # maintain the non-gradient context when calling the prediciton (cause we in inference)
+            with torch.no_grad():          
+            
+                #getting the prediction
+                midasTensor = midasModel(midas_input_img)          
            
-            #     #Resize the prediction to match the input image size before transforms
-            #     midasTensor = torch.nn.functional.interpolate(
-            #     midasTensor.unsqueeze(1),
-            #     size=imgRGB.shape[:2],
-            #     mode="bicubic",
-            #     align_corners=False,
-            # ).squeeze()
+                #Resize the prediction to match the input image size before transforms
+                midasTensor = torch.nn.functional.interpolate(
+                midasTensor.unsqueeze(1),
+                size=imgRGB.shape[:2],
+                mode="bicubic",
+                align_corners=False,
+                ).squeeze()
         
-            # #Convert the prediction to a NumPy array cause it's easy to handle better than a pytorch tensor
-            # midasNumpy = midasTensor.cpu().numpy()
+            #Convert the prediction to a NumPy array cause it's easy to handle better than a pytorch tensor
+            midasNumpy = midasTensor.cpu().numpy()
 
-            #apply inference
+            #apply yolo inference
             # results = yoloModel(img)
             
+            # # render the img inside the yolo results
             # results.render()  
+
+            # # make a copy of it to use it
             # rendered_img = results.ims[0].copy()
             
             # #loop on detected objcts and for each one get the className, and get the meandepth of bbox then print it
@@ -79,10 +84,13 @@ async def websocket_endpoint(websocket: WebSocket):
             #     cv2.putText(rendered_img, mean_depth_str, (int(x2), int(y2)), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2)
 
 
-            # img_buffer = BytesIO()
-            # Image.fromarray(rendered_img).save(img_buffer, format='JPEG')
-            # rendered_image_bytes = img_buffer.getvalue()
-            # await websocket.send_bytes(rendered_image_bytes)
+            # turn the numpy img to bytes
+            img_buffer = BytesIO()
+            Image.fromarray(midasNumpy).save(img_buffer, format='JPEG')
+            rendered_image_bytes = img_buffer.getvalue()
+
+            # send image bytes back via websocket
+            await websocket.send_bytes(rendered_image_bytes)
            
 
             # Filter results by classes of interest
