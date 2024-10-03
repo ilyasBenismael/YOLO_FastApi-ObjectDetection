@@ -1,9 +1,11 @@
 import torch
-from PIL import Image
-from io import BytesIO
 from fastapi import FastAPI, WebSocket
 import cv2
 import numpy as np
+from PIL import Image
+from io import BytesIO
+
+
 
 
 # Load YOLO model (yolov5n is a lightweight model)
@@ -12,7 +14,6 @@ yoloModel = torch.hub.load('ultralytics/yolov5', 'yolov5n', device='cpu')
 # Create FastAPI app
 myapp = FastAPI()
 
-#
 
 @myapp.websocket("/yolo")
 async def websocket_endpoint(websocket: WebSocket):
@@ -22,19 +23,17 @@ async def websocket_endpoint(websocket: WebSocket):
             # Receive the image bytes from the client
             image_bytes = await websocket.receive_bytes()
 
-            # Convert bytes to a NumPy array
+            # Convert bytes to a NumPy array for YOLO
             nparr = np.frombuffer(image_bytes, np.uint8)
             img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-            # apply yolo inference
+            # Apply YOLO inference
             results = yoloModel(img)
-            
-            # render the img inside the yolo results
-            results.render()    
 
-            # make a copy of it to use it
+            results.render()
+
             rendered_img = results.ims[0].copy()
-            
+
             # turn the numpy img to bytes
             img_buffer = BytesIO()
             Image.fromarray(rendered_img).save(img_buffer, format='JPEG')
@@ -42,11 +41,40 @@ async def websocket_endpoint(websocket: WebSocket):
 
             # send image bytes back via websocket
             await websocket.send_bytes(rendered_image_bytes)
-           
+
+                    
+            # detected_objects = []
+            # # Iterate over each prediction
+            # for pred in results.xyxy[0]:
+            #     x1, y1, x2, y2, confidence, class_id = pred
+                
+            #     # Filter out objects with confidence less than 0.35
+            #     if confidence >= 0.35:
+            #         # Get the class name from the class_id
+            #         class_name = yoloModel.names[int(class_id)]
+                    
+            #         # Add the object to the detected_objects list as a dictionary
+            #         detected_objects.append({
+            #             'class_name': class_name,
+            #             'coordinates': [x1.item(), y1.item(), x2.item(), y2.item()],
+            #             'confidence': confidence.item()
+            #         })
+
 
     except Exception as e:
-        await websocket.send_text(e)
+        await websocket.send_text(str(e))
         print(f"Error: {e}")
+
+
+
+
+
+
+
+
+
+
+
 
 
 
