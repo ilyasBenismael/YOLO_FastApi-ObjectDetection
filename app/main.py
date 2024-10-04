@@ -6,8 +6,6 @@ from PIL import Image
 from io import BytesIO
 
 
-
-
 # Load YOLO model (yolov5n is a lightweight model)
 yoloModel = torch.hub.load('ultralytics/yolov5', 'yolov5n', device='cpu')  
 
@@ -18,29 +16,45 @@ myapp = FastAPI()
 @myapp.websocket("/yolo")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
+    print("midas to yolo accepted")
+    a =0
+
     try:
         while True:
+            
+            received_message = await websocket.recv()
+            print("received from midas")
+
+            a=a+1
+            await websocket.send("hey abooood : ", a)
+    
             # Receive the image bytes from the client
-            image_bytes = await websocket.receive_bytes()
+            # image_bytes = await websocket.receive_bytes()
 
-            # Convert bytes to a NumPy array for YOLO
-            nparr = np.frombuffer(image_bytes, np.uint8)
-            img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+            # # Convert bytes to a NumPy array for YOLO
+            # nparr = np.frombuffer(image_bytes, np.uint8)
+            # img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-            # Apply YOLO inference
-            results = yoloModel(img)
+            # # Apply YOLO inference
+            # results = yoloModel(img)
 
-            results.render()
+            # print("got results")
 
-            rendered_img = results.ims[0].copy()
+            # results.render()
 
-            # turn the numpy img to bytes
-            img_buffer = BytesIO()
-            Image.fromarray(rendered_img).save(img_buffer, format='JPEG')
-            rendered_image_bytes = img_buffer.getvalue()
+            # rendered_img = results.ims[0].copy()
 
-            # send image bytes back via websocket
-            await websocket.send_bytes(rendered_image_bytes)
+            # # turn the numpy img to bytes
+            # img_buffer = BytesIO()
+            # Image.fromarray(rendered_img).save(img_buffer, format='JPEG')
+            # rendered_image_bytes = img_buffer.getvalue()
+
+            # # send image bytes back via websocket
+            # await websocket.send_bytes(rendered_image_bytes)
+
+
+######################################################################################""
+           
 
                     
             # detected_objects = []
