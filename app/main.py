@@ -17,16 +17,19 @@ myapp = FastAPI()
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     print("midas to yolo accepted")
-    a =0
+    a = 0
 
     try:
         while True:
-            
             received_message = await websocket.recv()
             print("received from midas")
 
-            a=a+1
-            await websocket.send("hey abooood : ", a)
+            a += 1
+            await websocket.send(f"hey abooood : {a}")
+    except Exception as e:
+        print(f"Error: {e}")
+        await websocket.close()
+
     
             # Receive the image bytes from the client
             # image_bytes = await websocket.receive_bytes()
@@ -75,9 +78,7 @@ async def websocket_endpoint(websocket: WebSocket):
             #         })
 
 
-    except Exception as e:
-        await websocket.send_text(str(e))
-        print(f"Error: {e}")
+
 
 
 
