@@ -28,6 +28,7 @@ async def websocket_endpoint(websocket: WebSocket):
             await websocket.send(f"hey abooood : {a}")
     except Exception as e:
         print(f"Error: {e}")
+        await websocket.send(f"yolo error : {e}")
         await websocket.close()
 
     
